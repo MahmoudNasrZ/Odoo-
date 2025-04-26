@@ -1,0 +1,50 @@
+<odoo>
+    <data>
+        <!-- Action for doctors list -->
+        <record id="action_hms_doctor" model="ir.actions.act_window">
+            <field name="name">Doctors</field>
+            <field name="res_model">hms.doctor</field>
+            <field name="view_mode">tree,form</field>
+            <field name="target">current</field>
+        </record>
+
+        <!-- Main Hospital Management Menu -->
+        <menuitem id="menu_hms" name="Hospital Management" sequence="1"/>
+
+        <!-- Doctor Menu under Hospital Management -->
+        <menuitem id="menu_hms_doctors" name="Doctors" parent="menu_hms" action="action_hms_doctor"/>
+
+        <!-- Doctor Form View -->
+        <record id="view_doctor_form" model="ir.ui.view">
+            <field name="name">doctor.form</field>
+            <field name="model">hms.doctor</field>
+            <field name="arch" type="xml">
+                <form string="Doctor">
+                    <sheet>
+                        <group>
+                            <field name="first_name"/>
+                            <field name="last_name"/>
+                            <field name="image"/>
+                            <field name="department_id"/>  <!-- Department field added -->
+                            <field name="patients"/>  <!-- Many2many field for patients -->
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Doctor Tree View -->
+        <record id="view_doctor_tree" model="ir.ui.view">
+            <field name="name">doctor.tree</field>
+            <field name="model">hms.doctor</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="first_name"/>
+                    <field name="last_name"/>
+                    <field name="department_id"/>  <!-- Department field added -->
+                </tree>
+            </field>
+        </record>
+
+    </data>
+</odoo>
