@@ -1,15 +1,21 @@
-# custom_addons/hms/models/patient.py
 from odoo import models, fields, api
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from odoo.exceptions import ValidationError
+import re
 
 class Patient(models.Model):
     _name = 'hms.patient'
     _description = 'Patient'
+    _rec_name = 'full_name'  # Use full_name as the display name
+    _sql_constraints = [
+        ('unique_email', 'UNIQUE(email)', 'Email must be unique!'),
+    ]
 
     first_name = fields.Char('First Name', required=True)
     last_name = fields.Char('Last Name', required=True)
+    full_name = fields.Char('Full Name', compute='_compute_full_name', store=True)  # New computed field
+    email = fields.Char('Email', required=True)
     birth_date = fields.Date('Birth Date')
     blood_type = fields.Selection([
         ('A', 'A'),
@@ -38,6 +44,19 @@ class Patient(models.Model):
     cr_ratio = fields.Float('CR Ratio')
     age = fields.Integer('Age', compute='_compute_age', store=True)
     log_ids = fields.One2many('hms.patient.log', 'patient_id', string='Log History')
+
+    @api.depends('first_name', 'last_name')
+    def _compute_full_name(self):
+        for record in self:
+            record.full_name = f"{record.first_name} {record.last_name}".strip() if record.first_name and record.last_name else record.first_name or record.last_name or ''
+
+    @api.constrains('email')
+    def _check_valid_email(self):
+        """Ensure email is in valid format."""
+        pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
+        for record in self:
+            if record.email and not re.match(pattern, record.email):
+                raise ValidationError('Please enter a valid email address.')
 
     @api.depends('birth_date')
     def _compute_age(self):
@@ -69,20 +88,16 @@ class Patient(models.Model):
 
             warnings = []
 
-            # PCR: Checked if age < 30
             if record.age < 30 and not record.pcr:
                 record.pcr = True
                 warnings.append('PCR has been checked because the age is less than 30.')
             elif record.age >= 30 and record.pcr:
                 record.pcr = False
                 warnings.append('PCR has been unchecked because the age is 30 or greater.')
-
-            # Clear history if age <= 50
             if record.age <= 50 and record.history:
                 record.history = False
                 warnings.append('Patient history has been hidden because the age is 50 or less.')
 
-            # Warn if PCR checked but no CR ratio
             if record.pcr and not record.cr_ratio:
                 warnings.append('Please enter the CR Ratio because PCR is checked.')
 
@@ -111,4 +126,20 @@ class Patient(models.Model):
                     'created_by': self.env.user.id,
                     'date': fields.Datetime.now(),
                 })
+        if 'email' in vals and vals['email']:
+            vals['email'] = vals['email'].lower()
+        if 'department_id' in vals and not vals['department_id']:
+            vals['doctor_ids'] = [(5, 0, 0)]
         return super(Patient, self).write(vals)
+
+    @api.model
+    def create(self, vals):
+        if 'email' in vals and vals['email']:
+            vals['email'] = vals['email'].lower()
+        return super(Patient, self).create(vals)
+
+    @api.onchange('department_id')
+    def _onchange_department_id(self):
+        for record in self:
+            if not record.department_id:
+                record.doctor_ids = [(5, 0, 0)]

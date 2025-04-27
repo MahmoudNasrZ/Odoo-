@@ -11,6 +11,7 @@
                             <group>
                                 <field name="first_name"/>
                                 <field name="last_name"/>
+                                <field name="email"/> <!-- NEW: Email field -->
                                 <field name="birth_date"/>
                                 <field name="blood_type"/>
                                 <field name="pcr"/>
@@ -52,6 +53,7 @@
                 <tree string="Patients">
                     <field name="first_name"/>
                     <field name="last_name"/>
+                    <field name="email"/> <!-- NEW: Email field -->
                     <field name="birth_date"/>
                     <field name="blood_type"/>
                     <field name="pcr"/>
@@ -72,6 +74,7 @@
                 <search string="Patients">
                     <field name="first_name"/>
                     <field name="last_name"/>
+                    <field name="email"/> <!-- NEW: Email field -->
                     <field name="department_id" domain="[('is_opened', '=', True)]"/>
                     <field name="doctor_ids"/>
                     <filter string="Undetermined" name="undetermined" domain="[('state', '=', 'undetermined')]"/>

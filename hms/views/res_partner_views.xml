@@ -1,0 +1,31 @@
+<odoo>
+    <data>
+        <!-- Inherit the res.partner form view to add fields in Sales & Purchases tab -->
+        <record id="view_partner_form_hms_inherit" model="ir.ui.view">
+            <field name="name">res.partner.form.inherit.hms</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='sales_purchases']" position="inside">
+                    <group name="group_misc" string="Misc">
+                        <field name="related_patient_id" widget="many2one"/>
+                        <field name="related_patient_name" readonly="1"/>
+                        <field name="vat" string="Tax ID"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Inherit the res.partner tree view to add the website field -->
+        <record id="view_partner_tree_hms_inherit" model="ir.ui.view">
+            <field name="name">res.partner.tree.inherit.hms</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='email']" position="after">
+                    <field name="website" optional="show"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

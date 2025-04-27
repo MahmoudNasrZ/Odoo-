@@ -9,12 +9,13 @@
         Manage departments, doctors, and patients
     """,
     'author': 'Mahmoud Nasr',
-    'depends': ['base'],
+    'depends': ['base','crm'],
     'data': [
         'security/ir.model.access.csv',
         'views/patient_views.xml',
         'views/department_views.xml',
         'views/doctor_views.xml',
+        'views/res_partner_views.xml',
     ],
     'installable': True,
     'application': True,
